@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study with Coffee & Lofi</title>
+     <!-- Favicon -->
+      <link rel="icon" type="image/png" sizes="32x32" href="coffee.png">
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Base styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+            background: linear-gradient(135deg, #f5e1d2, #f8c8c8);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        body.light {
+            background-color: #f5e1d2;
+            color: #4E342E;
+        }
+
+        body.dark {
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+            background: radial-gradient(circle at top left, #282c34, #1e1e2f);
+            background-size: cover;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-top: 10px;
+            text-align: center;
+            animation: fadeIn 1s ease, textBounce 2s ease-in-out infinite;
+        }
+
+        .music-panel {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .music-panel button {
+            background-color: #4E342E;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.4s, box-shadow 0.4s;
+            font-size: 1em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .music-panel button:hover {
+            background-color: #795548;
+            transform: scale(1.1);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            font-size: 1.5em;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .toggle-button:hover {
+            transform: scale(1.1) rotate(20deg);
+        }
+
+        .score {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 1.5em;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            animation: fadeIn 1s ease;
+        }
+
+        .score-bump {
+            transform: scale(1.2);
+            transition: transform 0.2s ease;
+        }
+
+        .bucket {
+            position: absolute;
+            bottom: 20px;
+            font-size: 80px;
+            transition: left 0.2s ease;
+        }
+
+        .glow-basket {
+            filter: drop-shadow(0 0 15px #f0e68c);
+        }
+
+        .item {
+            position: absolute;
+            font-size: 50px;
+            top: -10%;
+            animation: fall 5s linear forwards, rotate 3s linear infinite;
+        }
+
+        .floating-star, .floating-bean {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.7;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes fall {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes textBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="light">
+    <h1>Study with Coffee & Lofi</h1>
+    <div class="music-panel">
+        <button id="start-music">Play Music</button>
+        <button id="pause-music">Pause Music</button>
+    </div>
+
+    <div class="score" id="score">Score: 0</div>
+    <div class="bucket" id="bucket">🧺</div>
+    <div class="toggle-button" id="toggle-btn">☕</div>
+
+    <!-- Audio elements for day and night soft music -->
+    <audio id="day-music" src="https://www.bensound.com/bensound-music/bensound-relaxing.mp3" loop></audio>
+    <audio id="night-music" src="https://www.bensound.com/bensound-music/bensound-slowmotion.mp3" loop></audio>
+    <audio id="collectSound" src="your-collect-sound-url.mp3"></audio>
+
+    <script>
+        const dayMusic = document.getElementById('day-music');
+        const nightMusic = document.getElementById('night-music');
+        const playButton = document.getElementById('start-music');
+        const pauseButton = document.getElementById('pause-music');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const bucket = document.getElementById('bucket');
+
+        let currentMusic = dayMusic;
+
+        playButton.addEventListener('click', () => {
+            currentMusic.play();
+            playButton.textContent = 'Playing...';
+        });
+
+        pauseButton.addEventListener('click', () => {
+            currentMusic.pause();
+            playButton.textContent = 'Play Music';
+        });
+
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light');
+            document.body.classList.toggle('dark');
+            toggleBtn.textContent = document.body.classList.contains('dark') ? '🌙' : '☕';
+            
+            if (document.body.classList.contains('dark')) {
+                bucket.classList.add('glow-basket');
+                currentMusic.pause();
+                currentMusic = nightMusic;
+            } else {
+                bucket.classList.remove('glow-basket');
+                currentMusic.pause();
+                currentMusic = dayMusic;
+            }
+            playButton.textContent = 'Play Music';
+            addFloatingElements();
+        });
+
+        let score = 0;
+        let gameInterval;
+        let bucketPosition = window.innerWidth / 2 - 40;
+        let movingLeft = false;
+        let movingRight = false;
+
+        function moveBucket() {
+            const speed = 7; // Change this value to adjust the speed of the basket
+
+            if (movingLeft && bucketPosition > 0) bucketPosition -= speed;
+            if (movingRight && bucketPosition < window.innerWidth - 80) bucketPosition += speed;
+            bucket.style.left = `${bucketPosition}px`;
+            requestAnimationFrame(moveBucket);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') movingLeft = true;
+            if (e.key === 'ArrowRight') movingRight = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') movingLeft = false;
+            if (e.key === 'ArrowRight') movingRight = false;
+        });
+
+        function updateScore() {
+            score++;
+            const scoreEl = document.getElementById('score');
+            scoreEl.textContent = `Score: ${score}`;
+            scoreEl.classList.add('score-bump');
+            setTimeout(() => scoreEl.classList.remove('score-bump'), 200);
+        }
+
+        function createItem() {
+            const item = document.createElement('div');
+            item.classList.add('item');
+            if (document.body.classList.contains('dark')) {
+                item.textContent = '💡';
+                item.classList.add('glowing-star');
+            } else {
+                item.textContent = '🍪';
+            }
+            item.style.left = `${Math.random() * 90}vw`;
+            document.body.appendChild(item);
+
+            const fallInterval = setInterval(() => {
+                const itemRect = item.getBoundingClientRect();
+                const bucketRect = bucket.getBoundingClientRect();
+                if (
+                    itemRect.bottom >= bucketRect.top &&
+                    itemRect.left >= bucketRect.left &&
+                    itemRect.right <= bucketRect.right
+                ) {
+                    updateScore();
+                    document.getElementById('collectSound').play();
+                    item.remove();
+                    clearInterval(fallInterval);
+                }
+                if (itemRect.top >= window.innerHeight) {
+                    item.remove();
+                    clearInterval(fallInterval);
+                }
+            }, 50);
+        }
+
+        function startGame() {
+            score = 0;
+            document.getElementById('score').textContent = `Score: ${score}`;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(createItem, 2000);
+        }
+
+        function addFloatingElements() {
+            document.querySelectorAll('.floating-bean, .floating-star').forEach(el => el.remove());
+            const totalElements = 20; // Adjust the number for more or fewer floating elements
+            for (let i = 0; i < totalElements; i++) {
+                const element = document.createElement('div');
+                const spacing = (100 / totalElements) * i;
+
+                if (document.body.classList.contains('dark')) {
+                    element.textContent = '⭐';
+                    element.className = 'floating-star';
+                    element.style.color = '#ffd700';
+                } else {
+                    element.textContent = '☕';
+                    element.className = 'floating-bean';
+                    element.style.color = '#6f4e37';
+                }
+
+                element.style.left = `${spacing}vw`;
+                element.style.top = `${Math.random() * 100}vh`;
+                element.style.animationDelay = `${Math.random() * 5}s`;
+                document.body.appendChild(element);
+            }
+        }
+
+        moveBucket();
+        startGame();
+        addFloatingElements();
+    </script>
+</body>
+</html>
