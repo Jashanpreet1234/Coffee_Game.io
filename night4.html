@@ -8,11 +8,19 @@
       <link rel="icon" type="image/png" sizes="32x32" href="coffee.png">
 
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Base styling */
+        :root {
+            --light-start: #fbe8e3;
+            --light-end: #ffe3e3;
+            --dark-start: #2b3142;
+            --dark-end: #1d2233;
+            --accent: #6f4e37;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
@@ -22,20 +30,20 @@
             overflow: hidden;
             transition: background-color 0.5s ease, color 0.5s ease;
             position: relative;
-            background: linear-gradient(135deg, #f5e1d2, #f8c8c8);
+            background: linear-gradient(135deg, var(--light-start), var(--light-end));
             background-size: 400% 400%;
             animation: gradientShift 10s ease infinite;
         }
 
         body.light {
-            background-color: #f5e1d2;
-            color: #4E342E;
+            background-color: var(--light-start);
+            color: var(--accent);
         }
 
         body.dark {
-            background-color: #1e1e2f;
+            background-color: var(--dark-start);
             color: #e0e0e0;
-            background: radial-gradient(circle at top left, #282c34, #1e1e2f);
+            background: radial-gradient(circle at top left, var(--dark-start), var(--dark-end));
             background-size: cover;
         }
 
@@ -44,6 +52,12 @@
             margin-top: 10px;
             text-align: center;
             animation: fadeIn 1s ease, textBounce 2s ease-in-out infinite;
+        }
+
+        .instructions {
+            margin-top: 5px;
+            opacity: 0.8;
+            font-size: 0.9em;
         }
 
         .music-panel {
@@ -94,7 +108,7 @@
             left: 20px;
             font-size: 1.5em;
             color: white;
-            background: rgba(0, 0, 0, 0.6);
+            background: var(--accent);
             padding: 5px 10px;
             border-radius: 5px;
             animation: fadeIn 1s ease;
@@ -110,6 +124,7 @@
             bottom: 20px;
             font-size: 80px;
             transition: left 0.2s ease;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .glow-basket {
@@ -169,6 +184,7 @@
         <button id="start-music">Play Music</button>
         <button id="pause-music">Pause Music</button>
     </div>
+    <p class="instructions">Use the left and right arrow keys to move the basket and catch the falling items.</p>
 
     <div class="score" id="score">Score: 0</div>
     <div class="bucket" id="bucket">🧺</div>
